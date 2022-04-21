@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>分析vue中生命周期</title>
+    <script src="../js/vue.js"></script>
+</head>
+<body>
+<div id="root" :x="n">
+    <h1>当前的n值是{{ n }}</h1>
+    <h1 v-text="n"></h1>
+    <button @click="add">点我+1</button>
+    <button @click="bye">点我销毁vm</button>
+</div>
+<script type="text/javascript">
+    Vue.config.productionTip = false;
+    new Vue({
+        el:"#root",
+        //template模版字符串只能有一个根结点
+        // template:'<div><h1>当前的n值是{{ n }}</h1>\n' +
+        //     '<button @click="add">点我+1</button></div>',
+        //注意template是不能作为根标签来使用的，不能去骗vue，可以用fragment(vue3新加，模仿react)
+        data: {
+            n: 1
+        },
+        methods:{
+            add(){
+                console.log('add')
+                this.n++;
+            },
+            bye(){
+                //实例销毁后调用。该钩子被调用后，对应 Vue 实例的所有指令都被解绑，所有的(自定义)事件监听器被移除，所有的子实例也都被销毁。
+                console.log('bye');
+                this.$destroy();
+            }
+        },
+        watch:{
+            n(){
+                console.log('n变了');
+            }
+        },
+        beforeCreate(){
+            console.log('beforeCreate');
+            // console.log(this);
+
+        },
+        created(){
+            console.log('created');
+            // console.log(this);
+        },
+        beforeMount(){
+            console.log('beforeMount');
+            // console.log(this);
+        },
+        mounted(){
+            console.log('mounted');
+            console.log(this);
+            // document.querySelector('h1').innerText = 'hahah';
+        },
+        beforeUpdate(){
+            console.log('beforeUpdate');
+            //console.log(this.n); //此时数据是新的，页面还是旧的，vue还没根据新的数据去生成新的虚拟dom，去比较旧的虚拟dom
+        },
+        updated(){
+            console.log('updated');
+            console.log(this.n); //此时数据是新的，页面也是新的，同步
+        },
+        beforeDestroy(){
+            //仍然可以使用data,methods，关闭定时器，取消订阅消息，解绑自定义事件等收尾工作，移除watchers
+            console.log('beforeDestroy');
+            console.log(this.n);
+            // this.add(); //记住一旦到了beforeDestroy或者destroyed钩子，即使你拿到数据想要更新它也不会走更新的路了(beforeUpdate,updated)
+        },
+        //destroyed钩子几乎不用
+        destroyed(){
+          console.log('destroyed');
+        }
+    });
+
+
+</script>
+</body>
+</html>
